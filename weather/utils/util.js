@@ -15,7 +15,7 @@ function getLocation(callback) {
 
 // getWeatherByLocation 获取指定位置的天气信息
 function getWeatherByLocation(latitude, longitude, callback) {
-  var apiKey = "你自己的Key",
+  var apiKey = "448785d5fefefbded78b54c5e3d0aef0",
       apiURL = "https://api.darksky.net/forecast/" + apiKey + "/" + latitude + "," + longitude + "?lang=zh&units=ca"
 
   wx.request({
@@ -50,7 +50,7 @@ function parseWeatherData(data) {
 
 // getCityName 根据经纬度获取城市名称
 function getCityName(latitude, longitude, callback) {
-  var apiURL = "http://api.map.baidu.com/geocoder?output=json&location=" + latitude + "," + longitude + "&key=37492c0ee6f924cb5e934fa08c6b1676";
+  var apiURL = "http://api.map.baidu.com/geocoder/v2/?poiss=1&output=json&location=" + latitude + "," + longitude + "&ak=MW2tGUSaW3lhWkPwv0mC09MY3zh2mNEY";
 
   wx.request({
     url: apiURL,
@@ -70,14 +70,21 @@ function formatDate(timestamp) {
   return date.getMonth() + 1 + "月" + date.getDate() + "日" + formatWeekday(timestamp);
 }
 
-// formatTime 将时间戳格式化为时间
-function formatTime(timestamp) {
+// formatWeekday 将时间戳格式化为星期
+function formatWeekday(timestamp) {
 
   var date = new Date(timestamp * 1000),
       weekday = ["周日", "周一", "周二", "周三", "周四", "周五", "周六"],
       index = date.getDay();
 
   return weekday[index];
+}
+
+// formatTime 将时间戳格式化为时间
+function formatTime(timestamp) {
+  var date = new Date(timestamp)
+  
+  return date.getHours() + ":" + date.getMinutes();
 }
 
 // requestWeatherData加载天气数据
@@ -93,8 +100,8 @@ function requestWeatherData(cb) {
     }
 
     // 请求天气数据 API
-    getWeatherByLocation(latitude, longitude, function(){
-
+    getWeatherByLocation(latitude, longitude, function(weatherData){
+      console.log("=====weatherData==== :", weatherData)
       cb(weatherData);
 
     })
@@ -108,10 +115,10 @@ function loadWeatherData(callback) {
 
     // 对原始数据做一些修整， 然后输出给前端
     var weatherData = {};
-    weatherDataCurrent = data.current;
-    weatherDataCurrent.formattedData = formatDate(data.current.time);
-    weatherDataCurrent.formattedTime = formatTime(data.current.time);
-    weatherDataCurrent.temperature = parseInt(weatherDataCurrent.temperature);
+    weatherData = data;
+    weatherData.current.formattedData = formatDate(data.current.time);
+    weatherData.current.formattedTime = formatTime(data.current.time);
+    weatherData.current.temperature = parseInt(weatherData.current.temperature);
 
     var wantedDaily = [];
     for(var i = 1; i < weatherData.daily.data.length; i++) {

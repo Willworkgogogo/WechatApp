@@ -7,8 +7,10 @@ Page({
     weather: {}
   },
   onLoad: function () {
+
     var that = this;
     util.loadWeatherData(function(data){
+
       console.log(data)
       that.setData({
         weather: data
